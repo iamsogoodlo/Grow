@@ -1,9 +1,7 @@
 import SwiftUI
 import Combine
 import CoreData
-#if canImport(UIKit)
 import UIKit
-#endif
 
 class GameManager: ObservableObject {
     let context: NSManagedObjectContext
