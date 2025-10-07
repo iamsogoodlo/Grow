@@ -114,9 +114,4 @@ struct Achievement: Codable, Identifiable {
 }
 
 extension UserProfile: Identifiable {}
-extension Habit: Identifiable {}
-extension HabitLog: Identifiable {}
 extension WeeklyQuest: Identifiable {}
-extension Skill: Identifiable {}
-extension Badge: Identifiable {}
-extension Debuff: Identifiable {}
