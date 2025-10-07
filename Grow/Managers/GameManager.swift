@@ -1,7 +1,9 @@
 import SwiftUI
 import Combine
 import CoreData
+#if os(iOS)
 import UIKit
+#endif
 
 class GameManager: ObservableObject {
     let context: NSManagedObjectContext
@@ -17,7 +19,7 @@ class GameManager: ObservableObject {
     @Published var showAchievementModal = false
     @Published var showUndoSnackbar = false
     @Published var lastAction: (() -> Void)?
-    @Published var lastAchievement: Achievement?
+    @Published var lastAchievement: UnlockedAchievement?
     @Published var skillPoints = 0
     @Published var ironWillUsesThisWeek = 0
 
@@ -285,7 +287,7 @@ class GameManager: ObservableObject {
     }
     
     private func triggerHaptic(_ event: HapticEvent) {
-#if canImport(UIKit)
+#if os(iOS)
         let generator = UINotificationFeedbackGenerator()
         let feedbackType: UINotificationFeedbackGenerator.FeedbackType
 
@@ -299,6 +301,8 @@ class GameManager: ObservableObject {
         }
 
         generator.notificationOccurred(feedbackType)
+#else
+        _ = event
 #endif
     }
 }
