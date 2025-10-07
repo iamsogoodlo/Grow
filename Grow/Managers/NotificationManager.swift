@@ -1,5 +1,10 @@
 import UserNotifications
+
+#if os(iOS)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 class NotificationManager {
     static let shared = NotificationManager()
@@ -8,7 +13,7 @@ class NotificationManager {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
             if granted {
                 DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
+                    self.registerForRemoteNotifications()
                 }
             }
         }
@@ -50,4 +55,16 @@ class NotificationManager {
         
         UNUserNotificationCenter.current().add(request)
     }
+
+#if os(iOS)
+    private func registerForRemoteNotifications() {
+        UIApplication.shared.registerForRemoteNotifications()
+    }
+#elseif canImport(AppKit)
+    private func registerForRemoteNotifications() {
+        NSApplication.shared.registerForRemoteNotifications()
+    }
+#else
+    private func registerForRemoteNotifications() {}
+#endif
 }
