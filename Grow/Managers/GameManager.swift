@@ -1,5 +1,9 @@
 import SwiftUI
+import Combine
 import CoreData
+#if canImport(UIKit)
+import UIKit
+#endif
 
 class GameManager: ObservableObject {
     let context: NSManagedObjectContext
@@ -18,7 +22,13 @@ class GameManager: ObservableObject {
     @Published var lastAchievement: Achievement?
     @Published var skillPoints = 0
     @Published var ironWillUsesThisWeek = 0
-    
+
+    private enum HapticEvent {
+        case success
+        case warning
+        case error
+    }
+
     init(context: NSManagedObjectContext) {
         self.context = context
         loadData()
@@ -276,8 +286,21 @@ class GameManager: ObservableObject {
         }
     }
     
-    private func triggerHaptic(_ type: UINotificationFeedbackGenerator.FeedbackType) {
+    private func triggerHaptic(_ event: HapticEvent) {
+#if canImport(UIKit)
         let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(type)
+        let feedbackType: UINotificationFeedbackGenerator.FeedbackType
+
+        switch event {
+        case .success:
+            feedbackType = .success
+        case .warning:
+            feedbackType = .warning
+        case .error:
+            feedbackType = .error
+        }
+
+        generator.notificationOccurred(feedbackType)
+#endif
     }
 }

@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreData
+import Foundation
 
 enum HabitType: String, Codable, CaseIterable {
     case daily, weekly
@@ -42,7 +43,7 @@ enum SkillKey: String, Codable, CaseIterable {
     case nightOwl = "night_owl"
     case perfectionist = "perfectionist"
     case resilient = "resilient"
-    
+
     var name: String {
         switch self {
         case .earlyBird: return "Early Bird"
@@ -53,7 +54,7 @@ enum SkillKey: String, Codable, CaseIterable {
         case .resilient: return "Resilient"
         }
     }
-    
+
     var description: String {
         switch self {
         case .earlyBird: return "+10% EXP before 10am"
@@ -64,14 +65,16 @@ enum SkillKey: String, Codable, CaseIterable {
         case .resilient: return "Streak shield recharges faster"
         }
     }
-    
+
     var tier: Int {
         switch self {
-        case .earlyBird, .specialist, .ironWill: return 1
-        case .nightOwl, .perfectionist, .resilient: return 2
+        case .earlyBird, .specialist, .ironWill:
+            return 1
+        case .nightOwl, .perfectionist, .resilient:
+            return 2
         }
     }
-    
+
     var icon: String {
         switch self {
         case .earlyBird: return "sunrise.fill"
@@ -106,6 +109,7 @@ struct Achievement: Codable, Identifiable {
     let earnedAt: Date?
     let progress: Int
     let target: Int
+
     var isUnlocked: Bool { progress >= target }
 }
 
