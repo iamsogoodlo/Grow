@@ -113,10 +113,3 @@ struct Achievement: Codable, Identifiable {
     var isUnlocked: Bool { progress >= target }
 }
 
-extension UserProfile: Identifiable {}
-extension Habit: Identifiable {}
-extension HabitLog: Identifiable {}
-extension WeeklyQuest: Identifiable {}
-extension Skill: Identifiable {}
-extension Badge: Identifiable {}
-extension Debuff: Identifiable {}
