@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24299" systemVersion="24G90" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
-    <entity name="Badge" representedClassName="Badge" syncable="YES" codeGenerationType="class">
+    <entity name="Badge" representedClassName="Badge" syncable="YES" codeGenerationType="manual">
         <attribute name="earnedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="key" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="Debuff" representedClassName="Debuff" syncable="YES" codeGenerationType="class">
+    <entity name="Debuff" representedClassName="Debuff" syncable="YES" codeGenerationType="manual">
         <attribute name="appliedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="expiresAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="expReduction" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="key" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="Habit" representedClassName="Habit" syncable="YES" codeGenerationType="class">
+    <entity name="Habit" representedClassName="Habit" syncable="YES" codeGenerationType="manual">
         <attribute name="baseExp" optional="YES" attributeType="Integer 32" defaultValueString="30" usesScalarValueType="YES"/>
         <attribute name="bestStreak" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -27,7 +27,7 @@
         <attribute name="targetNumber" optional="YES" attributeType="Double" defaultValueString="1" usesScalarValueType="YES"/>
         <relationship name="logs" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HabitLog" inverseName="habit" inverseEntity="HabitLog"/>
     </entity>
-    <entity name="HabitLog" representedClassName="HabitLog" syncable="YES" codeGenerationType="class">
+    <entity name="HabitLog" representedClassName="HabitLog" syncable="YES" codeGenerationType="manual">
         <attribute name="completed" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="expGained" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -36,14 +36,14 @@
         <attribute name="valueNumber" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="habit" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Habit" inverseName="logs" inverseEntity="Habit"/>
     </entity>
-    <entity name="Skill" representedClassName="Skill" syncable="YES" codeGenerationType="class">
+    <entity name="Skill" representedClassName="Skill" syncable="YES" codeGenerationType="manual">
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isActive" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="key" optional="YES" attributeType="String"/>
         <attribute name="level" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
         <attribute name="tier" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
-    <entity name="UserProfile" representedClassName="UserProfile" syncable="YES" codeGenerationType="class">
+    <entity name="UserProfile" representedClassName="UserProfile" syncable="YES" codeGenerationType="manual">
         <attribute name="cleansesAvailable" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="displayName" optional="YES" attributeType="String"/>
@@ -55,7 +55,7 @@
         <attribute name="playerClass" optional="YES" attributeType="String"/>
         <attribute name="streakShieldAvailable" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
     </entity>
-    <entity name="WeeklyQuest" representedClassName="WeeklyQuest" syncable="YES" codeGenerationType="class">
+    <entity name="WeeklyQuest" representedClassName="WeeklyQuest" syncable="YES" codeGenerationType="manual">
         <attribute name="completed" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
