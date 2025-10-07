@@ -100,6 +100,19 @@ struct LeaderboardEntry: Codable, Identifiable {
     var rank: Int = 0
 }
 
+struct Achievement: Codable, Identifiable {
+    let id: String
+    let key: String
+    let name: String
+    let description: String
+    let icon: String
+    let earnedAt: Date?
+    let progress: Int
+    let target: Int
+
+    var isUnlocked: Bool { progress >= target }
+}
+
 extension UserProfile: Identifiable {}
 extension Habit: Identifiable {}
 extension HabitLog: Identifiable {}
