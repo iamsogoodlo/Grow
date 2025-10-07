@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreData
+import Foundation
 
 enum HabitType: String, Codable, CaseIterable {
     case daily, weekly
