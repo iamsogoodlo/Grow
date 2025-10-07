@@ -1,11 +1,24 @@
 import CoreData
 import Foundation
 
+struct UnlockedAchievement: Identifiable {
+    let id: String
+    let key: String
+    let name: String
+    let description: String
+    let icon: String
+    let earnedAt: Date?
+    let progress: Int
+    let target: Int
+
+    var isUnlocked: Bool { progress >= target }
+}
+
 class AchievementManager {
     static let shared = AchievementManager()
-    
-    func checkAchievements(gameManager: GameManager) -> [Achievement] {
-        var unlocked: [Achievement] = []
+
+    func checkAchievements(gameManager: GameManager) -> [UnlockedAchievement] {
+        var unlocked: [UnlockedAchievement] = []
         guard let profile = gameManager.profile else { return [] }
         
         let achievements = [
@@ -41,7 +54,7 @@ class AchievementManager {
             
             if shouldUnlock {
                 UserDefaults.standard.set(true, forKey: userDefaultKey)
-                let achievement = Achievement(
+                let achievement = UnlockedAchievement(
                     id: key,
                     key: key,
                     name: name,
