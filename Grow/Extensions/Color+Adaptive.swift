@@ -1,11 +1,19 @@
 import SwiftUI
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
+#if canImport(AppKit)
+import AppKit
+#endif
+
 extension Color {
     static var adaptiveSystemBackground: Color {
-        #if os(iOS)
-        return Color(UIColor.systemBackground)
-        #elseif os(macOS)
-        return Color(NSColor.windowBackgroundColor)
+        #if canImport(UIKit)
+        return Color(uiColor: .systemBackground)
+        #elseif canImport(AppKit)
+        return Color(nsColor: .windowBackgroundColor)
         #else
         return Color.white
         #endif

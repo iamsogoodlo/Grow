@@ -327,9 +327,7 @@ struct QuantityInputSheet: View {
                 VStack(spacing: 20) {
                     TextField("0", value: $value, format: .number)
                         .textFieldStyle(.plain)
-#if os(iOS)
-                        .keyboardType(.decimalPad)
-#endif
+                        .decimalPadKeyboard()
                         .font(.system(size: 60, weight: .bold))
                         .multilineTextAlignment(.center)
                         .frame(height: 80)
@@ -359,3 +357,17 @@ struct QuantityInputSheet: View {
         }
     }
 }
+
+#if os(iOS)
+private extension View {
+    func decimalPadKeyboard() -> some View {
+        keyboardType(.decimalPad)
+    }
+}
+#else
+private extension View {
+    func decimalPadKeyboard() -> some View {
+        self
+    }
+}
+#endif

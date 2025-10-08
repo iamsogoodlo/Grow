@@ -35,7 +35,7 @@ struct OnboardingView: View {
                 questPage.tag(3)
             }
 #if os(iOS)
-            .tabViewStyle(.page(indexDisplayMode: .always))
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
 #else
             .tabViewStyle(DefaultTabViewStyle())
 #endif
