@@ -412,7 +412,9 @@ struct WorkoutDetailSheet: View {
                 }
             }
             .navigationTitle("Log Workout")
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+#endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -489,7 +491,9 @@ struct AddExerciseSheet: View {
                 }
             }
             .navigationTitle("Add Exercise")
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+#endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -577,7 +581,9 @@ struct WorkoutDetailsView: View {
             }
             .background(Color.screenBackground.ignoresSafeArea())
             .navigationTitle("Workout Details")
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+#endif
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
