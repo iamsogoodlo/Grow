@@ -351,9 +351,11 @@ struct QuantityInputSheet: View {
                 Spacer()
             }
             .padding(.top, 40)
-            .navigationBarItems(
-                leading: Button("Cancel") { dismiss() }
-            )
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
         }
     }
 }
