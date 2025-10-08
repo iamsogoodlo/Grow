@@ -46,31 +46,28 @@ class GymManager: ObservableObject {
     
     func finishWorkout(_ workout: Workout, duration: Int, gameManager: GameManager) {
         workout.duration = Int32(duration)
-        
+
         // Calculate EXP based on duration and volume
         let volume = calculateWorkoutVolume(workout)
         let baseExp = min(duration / 2, 60)
         let volumeBonus = min(Int(volume / 1000), 40)
         let totalExp = baseExp + volumeBonus
-        
+
         workout.expGranted = Int32(totalExp)
-        
-        // Grant EXP to player
-        if let profile = gameManager.profile {
-            profile.expCurrent += Int32(totalExp)
-            
-            while profile.expCurrent >= profile.expToNext {
-                profile.expCurrent -= profile.expToNext
-                profile.level += 1
-                profile.expToNext = Int32(ScoringEngine.expForLevel(Int(profile.level)))
-                gameManager.skillPoints += 1
-                gameManager.showLevelUpModal = true
-            }
-        }
-        
+
+        gameManager.awardExp(
+            amount: totalExp,
+            source: .workout,
+            reason: workout.title ?? "Workout",
+            metadata: [
+                "duration": String(duration),
+                "volume": String(format: "%.0f", volume)
+            ]
+        )
+
         // Check for PRs
         checkForPRs(workout, gameManager: gameManager)
-        
+
         saveContext()
         loadData()
     }
@@ -99,9 +96,15 @@ class GymManager: ObservableObject {
                     badge.key = "pr_\(exercise.replacingOccurrences(of: " ", with: "_").lowercased())"
                     badge.earnedAt = Date()
                     
-                    if let profile = gameManager.profile {
-                        profile.expCurrent += 50
-                    }
+                    gameManager.awardExp(
+                        amount: 50,
+                        source: .personalRecord,
+                        reason: "PR: \(exercise)",
+                        metadata: [
+                            "exercise": exercise,
+                            "oneRM": String(format: "%.1f", oneRM)
+                        ]
+                    )
                 }
             } else {
                 personalRecords[exercise] = oneRM
