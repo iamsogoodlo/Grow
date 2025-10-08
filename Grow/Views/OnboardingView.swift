@@ -34,7 +34,11 @@ struct OnboardingView: View {
                 habitsPage.tag(2)
                 questPage.tag(3)
             }
+#if os(iOS)
             .tabViewStyle(.page(indexDisplayMode: .always))
+#else
+            .tabViewStyle(DefaultTabViewStyle())
+#endif
         }
     }
     
@@ -309,7 +313,7 @@ struct HabitCheckbox: View {
                 Spacer()
             }
             .padding()
-            .background(Color(.systemBackground))
+            .background(Color.adaptiveSystemBackground)
             .cornerRadius(12)
         }
     }
