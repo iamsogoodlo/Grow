@@ -39,7 +39,7 @@
 		74D238402E95AB1500527E63 /* Exceptions for "Grow" folder in "Grow" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-                                Info.plist,
+				Info.plist,
 			);
 			target = 74D238192E95AB1400527E63 /* Grow */;
 		};
