@@ -4,6 +4,7 @@ struct NutritionView: View {
     @ObservedObject var nutritionManager: NutritionManager
     let profile: UserProfile?
     @ObservedObject var gameManager: GameManager
+    let onMenuToggle: () -> Void
 
     @State private var showAddFood = false
     @State private var showAddWeight = false
@@ -85,6 +86,10 @@ struct NutritionView: View {
             .background(Color.screenBackground.ignoresSafeArea())
             .navigationTitle("Nutrition")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    MenuButton(action: onMenuToggle)
+                }
+
                 ToolbarItemGroup(placement: .primaryAction) {
                     Button {
                         showScanner = true
