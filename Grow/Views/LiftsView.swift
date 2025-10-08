@@ -62,51 +62,69 @@ struct LiftsView: View {
     }
 
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    OverviewSection(
-                        metrics: overviewMetrics,
-                        selectedRange: $selectedRange,
-                        trendPoints: trendPoints
-                    )
-
-                    GoalsSection(personalRecords: gymManager.personalRecords)
-
-                    if let workout = latestWorkout {
-                        SpotlightWorkoutCard(
-                            workout: workout,
-                            volume: workoutVolume(workout),
-                            totalReps: totalReps(for: workout)
-                        )
-                    }
-
-                    ProgramsYouFollowSection()
-
-                    RecentSessionsSection(
-                        workouts: workouts,
-                        calculateVolume: workoutVolume,
-                        calculateXP: estimatedXP
-                    )
-                }
-                .padding(.vertical, 24)
-                .padding(.horizontal)
-            }
-            .background(Color.liftsGroupedBackground)
-            .navigationTitle("Lifts")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showNewWorkout = true }) {
-                        Label("Log workout", systemImage: "plus.circle.fill")
-                            .labelStyle(.iconOnly)
-                            .font(.title2)
-                    }
-                }
-            }
+        navigationContainer
             .sheet(isPresented: $showNewWorkout) {
                 NewWorkoutSheet(gymManager: gymManager, gameManager: gameManager)
             }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button(action: { showNewWorkout = true }) {
+                        Label("Log workout", systemImage: "plus.circle.fill")
+                    }
+                }
+            }
+    }
+
+    @ViewBuilder
+    private var navigationContainer: some View {
+        if #available(iOS 16.0, macOS 13.0, *) {
+            NavigationStack {
+                liftsContent
+            }
+        } else {
+            NavigationView {
+                liftsContent
+            }
+#if os(iOS)
+            .navigationViewStyle(StackNavigationViewStyle())
+#endif
         }
+    }
+
+    private var liftsContent: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                LogWorkoutButton(showNewWorkout: $showNewWorkout)
+
+                OverviewSection(
+                    metrics: overviewMetrics,
+                    selectedRange: $selectedRange,
+                    trendPoints: trendPoints
+                )
+
+                GoalsSection(personalRecords: gymManager.personalRecords)
+
+                if let workout = latestWorkout {
+                    SpotlightWorkoutCard(
+                        workout: workout,
+                        volume: workoutVolume(workout),
+                        totalReps: totalReps(for: workout)
+                    )
+                }
+
+                ProgramsYouFollowSection(startWorkout: { showNewWorkout = true })
+
+                RecentSessionsSection(
+                    workouts: workouts,
+                    calculateVolume: workoutVolume,
+                    calculateXP: estimatedXP
+                )
+            }
+            .padding(.vertical, 24)
+            .padding(.horizontal)
+        }
+        .background(Color.liftsGroupedBackground)
+        .navigationTitle("Lifts")
     }
 
     private func workoutVolume(_ workout: Workout) -> Double {
@@ -168,6 +186,40 @@ private struct OverviewSection: View {
                 .fill(Color.liftsSecondaryGroupedBackground)
                 .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 8)
         )
+    }
+}
+
+private struct LogWorkoutButton: View {
+    @Binding var showNewWorkout: Bool
+
+    var body: some View {
+        Button {
+            showNewWorkout = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "dumbbell.fill")
+                    .font(.title3.weight(.semibold))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Log lifts")
+                        .font(.headline)
+                    Text("Capture your sets to earn experience and track progress")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.body.weight(.semibold))
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(Color.accentColor.opacity(0.12))
+            )
+        }
+        .buttonStyle(.plain)
+        .contentShape(Rectangle())
     }
 }
 
@@ -496,6 +548,8 @@ private struct WorkoutSetRow: View {
 // MARK: - Programs
 
 private struct ProgramsYouFollowSection: View {
+    let startWorkout: () -> Void
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -513,21 +567,27 @@ private struct ProgramsYouFollowSection: View {
             }
 
             VStack(spacing: 16) {
-                ProgramCard(
-                    title: "PPL Strength",
-                    subtitle: "5 day split • Week 7",
-                    tags: ["Push", "Pull", "Legs"],
-                    progress: 0.68,
-                    accent: .blue
-                )
+                Button(action: startWorkout) {
+                    ProgramCard(
+                        title: "PPL Strength",
+                        subtitle: "5 day split • Week 7",
+                        tags: ["Push", "Pull", "Legs"],
+                        progress: 0.68,
+                        accent: .blue
+                    )
+                }
+                .buttonStyle(.plain)
 
-                ProgramCard(
-                    title: "Hypertrophy Builder",
-                    subtitle: "Upper/Lower • Week 3",
-                    tags: ["Upper", "Lower"],
-                    progress: 0.42,
-                    accent: .green
-                )
+                Button(action: startWorkout) {
+                    ProgramCard(
+                        title: "Hypertrophy Builder",
+                        subtitle: "Upper/Lower • Week 3",
+                        tags: ["Upper", "Lower"],
+                        progress: 0.42,
+                        accent: .green
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
         .padding(20)
