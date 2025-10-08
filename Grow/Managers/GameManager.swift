@@ -13,6 +13,8 @@ class GameManager: ObservableObject {
     @Published var activeDebuffs: [Debuff] = []
     @Published var weeklyQuest: WeeklyQuest?
     @Published var skills: [Skill] = []
+
+    @Published var experienceTimeline: [ExperienceEvent] = []
     
     @Published var showLevelUpModal = false
     @Published var showChestModal = false
@@ -91,7 +93,15 @@ class GameManager: ObservableObject {
         }
         habit.lastCompletedDate = Date()
         
-        addExp(expGain)
+        awardExp(
+            amount: expGain,
+            source: .habit,
+            reason: habit.name ?? "Habit Completed",
+            metadata: [
+                "habitId": habit.id?.uuidString ?? "",
+                "value": String(value)
+            ]
+        )
         
         if habit.habitType == HabitType.weekly.rawValue, let quest = weeklyQuest {
             quest.progressCount += 1
@@ -110,7 +120,16 @@ class GameManager: ObservableObject {
         setupUndo {
             self.context.delete(log)
             habit.currentStreak = max(0, habit.currentStreak - 1)
-            self.profile?.expCurrent -= Int32(expGain)
+            self.applyExpChange(-expGain)
+            if let habitId = habit.id?.uuidString {
+                if let index = self.experienceTimeline.firstIndex(where: { event in
+                    event.source == .habit &&
+                    event.metadata["habitId"] == habitId &&
+                    event.amount == expGain
+                }) {
+                    self.experienceTimeline.remove(at: index)
+                }
+            }
             self.saveContext()
             self.loadData()
         }
@@ -143,11 +162,15 @@ class GameManager: ObservableObject {
         debuff.expiresAt = Calendar.current.date(byAdding: .hour, value: 24, to: Date()) ?? Date()
         debuff.expReduction = 0.05
         
-        if let profile = profile {
-            profile.expCurrent -= Int32(penalty)
-            if profile.expCurrent < 0 { profile.expCurrent = 0 }
-        }
-        
+        awardExp(
+            amount: -penalty,
+            source: .habitPenalty,
+            reason: habit.name ?? "Penalty",
+            metadata: [
+                "habitId": habit.id?.uuidString ?? ""
+            ]
+        )
+
         saveContext()
         loadData()
         triggerHaptic(.error)
@@ -170,20 +193,45 @@ class GameManager: ObservableObject {
         triggerHaptic(.success)
     }
     
-    private func addExp(_ amount: Int) {
+    func awardExp(
+        amount: Int,
+        source: ExperienceSource,
+        reason: String,
+        metadata: [String: String] = [:]
+    ) {
+        guard amount != 0 else { return }
+
+        let event = ExperienceEvent(
+            amount: amount,
+            source: source,
+            reason: reason,
+            metadata: metadata,
+            timestamp: Date()
+        )
+
+        experienceTimeline.insert(event, at: 0)
+        if experienceTimeline.count > 50 {
+            experienceTimeline = Array(experienceTimeline.prefix(50))
+        }
+
+        applyExpChange(amount)
+    }
+
+    private func applyExpChange(_ amount: Int) {
         guard let profile = profile else { return }
-        
+
         profile.expCurrent += Int32(amount)
-        
+        if profile.expCurrent < 0 { profile.expCurrent = 0 }
+
         while profile.expCurrent >= profile.expToNext {
             profile.expCurrent -= profile.expToNext
             profile.level += 1
             profile.expToNext = Int32(ScoringEngine.expForLevel(Int(profile.level)))
-            
+
             skillPoints += 1
             showLevelUpModal = true
             triggerHaptic(.success)
-            
+
             checkAchievements()
         }
     }

@@ -24,7 +24,16 @@ class NutritionManager: ObservableObject {
     
     // MARK: - Food Logging
     
-    func logFood(label: String, kcal: Int, protein: Int = 0, carbs: Int = 0, fat: Int = 0, meal: String? = nil) {
+    func logFood(
+        label: String,
+        kcal: Int,
+        protein: Int = 0,
+        carbs: Int = 0,
+        fat: Int = 0,
+        meal: String? = nil,
+        gameManager: GameManager? = nil,
+        source: ExperienceSource = .nutrition
+    ) {
         let log = FoodLog(context: context)
         log.id = UUID()
         log.date = Date()
@@ -35,7 +44,22 @@ class NutritionManager: ObservableObject {
         log.fat = Int32(fat)
         log.meal = meal
         log.isFavorite = false
-        
+
+        if let manager = gameManager {
+            let exp = calculateExpForFood(kcal: kcal, protein: protein, carbs: carbs, fat: fat)
+            if exp > 0 {
+                manager.awardExp(
+                    amount: exp,
+                    source: source,
+                    reason: "Logged \(label)",
+                    metadata: [
+                        "kcal": String(kcal),
+                        "protein": String(protein)
+                    ]
+                )
+            }
+        }
+
         saveContext()
         loadData()
     }
@@ -54,12 +78,22 @@ class NutritionManager: ObservableObject {
     
     // MARK: - Weight Tracking
     
-    func logWeight(_ kg: Double, date: Date = Date()) {
+    func logWeight(_ kg: Double, date: Date = Date(), gameManager: GameManager? = nil) {
         let entry = WeightEntry(context: context)
         entry.id = UUID()
         entry.date = date
         entry.kg = kg
-        
+
+        if let manager = gameManager {
+            let exp = max(10, Int(kg.rounded()) / 10)
+            manager.awardExp(
+                amount: exp,
+                source: .weight,
+                reason: "Logged weight",
+                metadata: ["kg": String(format: "%.1f", kg)]
+            )
+        }
+
         saveContext()
         loadData()
     }
@@ -78,6 +112,16 @@ class NutritionManager: ObservableObject {
         let carbs = todayFoodLogs.reduce(0) { $0 + Int($1.carbs) }
         let fat = todayFoodLogs.reduce(0) { $0 + Int($1.fat) }
         return (kcal, protein, carbs, fat)
+    }
+
+    func calculateExpForFood(kcal: Int, protein: Int, carbs: Int, fat: Int) -> Int {
+        let proteinBonus = protein * 2
+        let balanceBonus = max(0, 10 - abs(protein + carbs + fat - (kcal / 10)))
+        let density = Double(kcal) / max(Double(protein + carbs + fat), 1)
+        let densityBonus = density > 9 ? 5 : 15
+
+        let total = proteinBonus + balanceBonus + densityBonus
+        return max(5, total)
     }
     
     func weightTrend(days: Int = 7) -> [Double] {

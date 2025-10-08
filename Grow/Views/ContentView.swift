@@ -3,11 +3,17 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var gameManager: GameManager
+    @StateObject private var nutritionManager: NutritionManager
+    @StateObject private var gymManager: GymManager
+    @StateObject private var galleryManager: GalleryManager
     @State private var selectedTab = 0
     
     init() {
         let context = PersistenceController.shared.container.viewContext
         _gameManager = StateObject(wrappedValue: GameManager(context: context))
+        _nutritionManager = StateObject(wrappedValue: NutritionManager(context: context))
+        _gymManager = StateObject(wrappedValue: GymManager(context: context))
+        _galleryManager = StateObject(wrappedValue: GalleryManager(context: context))
     }
     
     var body: some View {
@@ -21,18 +27,34 @@ struct ContentView: View {
                             Label("Today", systemImage: "house.fill")
                         }
                         .tag(0)
-                    
-                    Text("Progress")
+
+                    NutritionView(
+                        nutritionManager: nutritionManager,
+                        profile: gameManager.profile,
+                        gameManager: gameManager
+                    )
+                    .tabItem {
+                        Label("Nutrition", systemImage: "fork.knife")
+                    }
+                    .tag(1)
+
+                    LiftsView(gymManager: gymManager, gameManager: gameManager)
                         .tabItem {
-                            Label("Progress", systemImage: "chart.line.uptrend.xyaxis")
-                        }
-                        .tag(1)
-                    
-                    Text("Skills")
-                        .tabItem {
-                            Label("Skills", systemImage: "star.fill")
+                            Label("Lifts", systemImage: "dumbbell")
                         }
                         .tag(2)
+
+                    LeaderboardView(gameManager: gameManager)
+                        .tabItem {
+                            Label("Leaderboard", systemImage: "trophy.fill")
+                        }
+                        .tag(3)
+
+                    GalleryView(galleryManager: galleryManager)
+                        .tabItem {
+                            Label("Progress", systemImage: "photo.on.rectangle")
+                        }
+                        .tag(4)
                 }
                 .overlay(alignment: .bottom) {
                     if gameManager.showUndoSnackbar {
