@@ -229,7 +229,7 @@ struct DailySummaryCard: View {
     }
 }
 
-private enum MacroType: String, CaseIterable {
+enum MacroType: String, CaseIterable {
     case protein = "Protein"
     case carbs = "Carbs"
     case fat = "Fat"
