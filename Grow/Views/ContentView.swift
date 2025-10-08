@@ -30,7 +30,8 @@ struct ContentView: View {
 
                     NutritionView(
                         nutritionManager: nutritionManager,
-                        profile: gameManager.profile
+                        profile: gameManager.profile,
+                        gameManager: gameManager
                     )
                     .tabItem {
                         Label("Nutrition", systemImage: "fork.knife")
