@@ -1,4 +1,9 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 struct LiftsView: View {
     @ObservedObject var gymManager: GymManager
@@ -87,7 +92,7 @@ struct LiftsView: View {
                 .padding(.vertical, 24)
                 .padding(.horizontal)
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color.liftsGroupedBackground)
             .navigationTitle("Lifts")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -160,7 +165,7 @@ private struct OverviewSection: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color(.secondarySystemGroupedBackground))
+                .fill(Color.liftsSecondaryGroupedBackground)
                 .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 8)
         )
     }
@@ -270,7 +275,7 @@ private struct OverviewMetricTile: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(.systemBackground))
+                .fill(Color.liftsSystemBackground)
         )
     }
 }
@@ -316,7 +321,7 @@ private struct GoalsSection: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color(.systemBackground))
+                .fill(Color.liftsSystemBackground)
         )
     }
 }
@@ -364,7 +369,7 @@ private struct GoalProgressRing: View {
         .frame(width: 150)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color(.secondarySystemGroupedBackground))
+                .fill(Color.liftsSecondaryGroupedBackground)
         )
     }
 }
@@ -416,7 +421,7 @@ private struct SpotlightWorkoutCard: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color(.systemBackground))
+                .fill(Color.liftsSystemBackground)
                 .shadow(color: Color.black.opacity(0.05), radius: 12, x: 0, y: 6)
         )
     }
@@ -452,7 +457,7 @@ private struct MetricChip: View {
         .padding(.horizontal, 12)
         .background(
             Capsule(style: .continuous)
-                .fill(Color(.secondarySystemGroupedBackground))
+                .fill(Color.liftsSecondaryGroupedBackground)
         )
     }
 }
@@ -483,7 +488,7 @@ private struct WorkoutSetRow: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(.tertiarySystemGroupedBackground))
+                .fill(Color.liftsTertiaryGroupedBackground)
         )
     }
 }
@@ -528,7 +533,7 @@ private struct ProgramsYouFollowSection: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color(.systemBackground))
+                .fill(Color.liftsSystemBackground)
         )
     }
 }
@@ -571,7 +576,7 @@ private struct ProgramCard: View {
         .padding(18)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color(.secondarySystemGroupedBackground))
+                .fill(Color.liftsSecondaryGroupedBackground)
         )
     }
 }
@@ -625,7 +630,7 @@ private struct RecentSessionsSection: View {
                 .padding(32)
                 .background(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(Color(.secondarySystemGroupedBackground))
+                        .fill(Color.liftsSecondaryGroupedBackground)
                 )
             } else {
                 ForEach(workouts.prefix(5)) { workout in
@@ -640,7 +645,7 @@ private struct RecentSessionsSection: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Color(.systemBackground))
+                .fill(Color.liftsSystemBackground)
         )
     }
 }
@@ -678,13 +683,13 @@ private struct RecentWorkoutRow: View {
                 }
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.tertiaryLabel)
+                    .foregroundColor(Color.liftsTertiaryLabel)
             }
         }
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color(.secondarySystemGroupedBackground))
+                .fill(Color.liftsSecondaryGroupedBackground)
         )
     }
 }
@@ -995,8 +1000,12 @@ struct AddSetSheet: View {
                 Section("Details") {
                     Stepper("Sets: \(setCount)", value: $setCount, in: 1...10)
                     Stepper("Reps: \(reps)", value: $reps, in: 1...50)
+                    #if os(iOS)
                     TextField("Weight (kg)", text: $weight)
                         .keyboardType(.decimalPad)
+                    #else
+                    TextField("Weight (kg)", text: $weight)
+                    #endif
                     Stepper("RPE: \(rpe)", value: $rpe, in: 1...10)
                 }
             }
@@ -1021,5 +1030,47 @@ struct AddSetSheet: View {
                 exercise = exercises.first ?? ""
             }
         }
+    }
+}
+
+private extension Color {
+    static var liftsGroupedBackground: Color {
+        #if canImport(UIKit)
+        return Color(UIColor.systemGroupedBackground)
+        #else
+        return Color(NSColor.windowBackgroundColor)
+        #endif
+    }
+
+    static var liftsSecondaryGroupedBackground: Color {
+        #if canImport(UIKit)
+        return Color(UIColor.secondarySystemGroupedBackground)
+        #else
+        return Color(NSColor.controlBackgroundColor)
+        #endif
+    }
+
+    static var liftsTertiaryGroupedBackground: Color {
+        #if canImport(UIKit)
+        return Color(UIColor.tertiarySystemGroupedBackground)
+        #else
+        return Color(NSColor.underPageBackgroundColor)
+        #endif
+    }
+
+    static var liftsSystemBackground: Color {
+        #if canImport(UIKit)
+        return Color(UIColor.systemBackground)
+        #else
+        return Color(NSColor.textBackgroundColor)
+        #endif
+    }
+
+    static var liftsTertiaryLabel: Color {
+        #if canImport(UIKit)
+        return Color(UIColor.tertiaryLabel)
+        #else
+        return Color(NSColor.tertiaryLabelColor)
+        #endif
     }
 }
