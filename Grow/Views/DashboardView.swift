@@ -116,7 +116,7 @@ struct ProfileHeader: View {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(.systemBackground))
+                    .fill(Color.adaptiveSystemBackground)
                     .shadow(color: .black.opacity(0.1), radius: 10)
             )
             .padding(.horizontal)
@@ -288,7 +288,7 @@ struct HabitCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 15)
-                .fill(Color(.systemBackground))
+                .fill(Color.adaptiveSystemBackground)
                 .shadow(color: .black.opacity(0.05), radius: 5)
         )
         .padding(.horizontal)
@@ -327,7 +327,7 @@ struct QuantityInputSheet: View {
                 VStack(spacing: 20) {
                     TextField("0", value: $value, format: .number)
                         .textFieldStyle(.plain)
-                        .keyboardType(.decimalPad)
+                        .decimalPadKeyboard()
                         .font(.system(size: 60, weight: .bold))
                         .multilineTextAlignment(.center)
                         .frame(height: 80)
@@ -351,9 +351,25 @@ struct QuantityInputSheet: View {
                 Spacer()
             }
             .padding(.top, 40)
-            .navigationBarItems(
-                leading: Button("Cancel") { dismiss() }
-            )
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
         }
     }
 }
+
+#if os(iOS)
+private extension View {
+    func decimalPadKeyboard() -> some View {
+        keyboardType(.decimalPad)
+    }
+}
+#else
+private extension View {
+    func decimalPadKeyboard() -> some View {
+        self
+    }
+}
+#endif
