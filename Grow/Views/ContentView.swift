@@ -38,9 +38,9 @@ struct ContentView: View {
                     }
                     .tag(1)
 
-                    GymView(gymManager: gymManager, gameManager: gameManager)
+                    LiftsView(gymManager: gymManager, gameManager: gameManager)
                         .tabItem {
-                            Label("Gym", systemImage: "dumbbell")
+                            Label("Lifts", systemImage: "dumbbell")
                         }
                         .tag(2)
 
