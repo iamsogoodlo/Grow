@@ -1,19 +1,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var gameManager: GameManager
     @StateObject private var nutritionManager: NutritionManager
     @StateObject private var gymManager: GymManager
-    @StateObject private var galleryManager: GalleryManager
-    @State private var selectedTab = 0
-    
+    @State private var selectedModule: AppModule = .yuka
+    @State private var isMenuVisible = false
+
     init() {
         let context = PersistenceController.shared.container.viewContext
         _gameManager = StateObject(wrappedValue: GameManager(context: context))
         _nutritionManager = StateObject(wrappedValue: NutritionManager(context: context))
         _gymManager = StateObject(wrappedValue: GymManager(context: context))
-        _galleryManager = StateObject(wrappedValue: GalleryManager(context: context))
     }
     
     var body: some View {
@@ -21,44 +19,32 @@ struct ContentView: View {
             if gameManager.profile == nil {
                 OnboardingView(gameManager: gameManager)
             } else {
-                TabView(selection: $selectedTab) {
-                    DashboardView(gameManager: gameManager)
-                        .tabItem {
-                            Label("Today", systemImage: "house.fill")
+                ZStack(alignment: .leading) {
+                    activeModuleView
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .overlay {
+                            if isMenuVisible {
+                                Color.black.opacity(0.35)
+                                    .ignoresSafeArea()
+                                    .onTapGesture { toggleMenu() }
+                            }
                         }
-                        .tag(0)
+                        .disabled(isMenuVisible)
+                        .animation(.easeInOut(duration: 0.2), value: isMenuVisible)
 
-                    NutritionView(
-                        nutritionManager: nutritionManager,
-                        profile: gameManager.profile,
-                        gameManager: gameManager
+                    SideMenuView(
+                        selection: selectedModule,
+                        onSelect: { module in
+                            selectedModule = module
+                            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                                isMenuVisible = false
+                            }
+                        }
                     )
-                    .tabItem {
-                        Label("Nutrition", systemImage: "fork.knife")
-                    }
-                    .tag(1)
-
-                    WorkoutView(
-                        workoutManager: gymManager,
-                        gameManager: gameManager,
-                        profile: gameManager.profile
-                    )
-                    .tabItem {
-                        Label("Workouts", systemImage: "dumbbell")
-                    }
-                    .tag(2)
-
-                    LeaderboardView(gameManager: gameManager)
-                        .tabItem {
-                            Label("Leaderboard", systemImage: "trophy.fill")
-                        }
-                        .tag(3)
-
-                    GalleryView(galleryManager: galleryManager)
-                        .tabItem {
-                            Label("Progress", systemImage: "photo.on.rectangle")
-                        }
-                        .tag(4)
+                    .frame(width: 280)
+                    .offset(x: isMenuVisible ? 0 : -320)
+                    .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 10)
+                    .animation(.spring(response: 0.32, dampingFraction: 0.82), value: isMenuVisible)
                 }
                 .overlay(alignment: .bottom) {
                     if gameManager.showUndoSnackbar {
@@ -74,6 +60,42 @@ struct ContentView: View {
                     ChestModal(gameManager: gameManager)
                 }
             }
+        }
+    }
+
+    private func toggleMenu() {
+        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+            isMenuVisible.toggle()
+        }
+    }
+
+    @ViewBuilder
+    private var activeModuleView: some View {
+        switch selectedModule {
+        case .yuka:
+            YukaScannerView(
+                nutritionManager: nutritionManager,
+                gameManager: gameManager,
+                onMenuToggle: toggleMenu
+            )
+        case .strava:
+            StravaHubView(
+                gymManager: gymManager,
+                gameManager: gameManager,
+                profile: gameManager.profile,
+                onMenuToggle: toggleMenu
+            )
+        case .myFitnessPal:
+            NutritionView(
+                nutritionManager: nutritionManager,
+                profile: gameManager.profile,
+                gameManager: gameManager,
+                onMenuToggle: toggleMenu
+            )
+        case .studyBunny:
+            StudyTrackerView(onMenuToggle: toggleMenu)
+        case .habitTracker:
+            HabitTrackerView(onMenuToggle: toggleMenu)
         }
     }
 }
