@@ -38,11 +38,15 @@ struct ContentView: View {
                     }
                     .tag(1)
 
-                    LiftsView(gymManager: gymManager, gameManager: gameManager)
-                        .tabItem {
-                            Label("Lifts", systemImage: "dumbbell")
-                        }
-                        .tag(2)
+                    WorkoutView(
+                        workoutManager: gymManager,
+                        gameManager: gameManager,
+                        profile: gameManager.profile
+                    )
+                    .tabItem {
+                        Label("Workouts", systemImage: "dumbbell")
+                    }
+                    .tag(2)
 
                     LeaderboardView(gameManager: gameManager)
                         .tabItem {

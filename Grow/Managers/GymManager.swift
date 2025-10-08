@@ -26,7 +26,7 @@ class GymManager: ObservableObject {
         workout.date = Date()
         workout.title = title
         workout.duration = 0
-        
+
         for (index, setData) in sets.enumerated() {
             let workoutSet = WorkoutSet(context: context)
             workoutSet.id = UUID()
@@ -38,12 +38,32 @@ class GymManager: ObservableObject {
             workoutSet.orderIndex = Int16(index)
             workoutSet.workout = workout
         }
-        
+
         saveContext()
         loadData()
         return workout
     }
-    
+
+    func logWorkout(
+        name: String,
+        duration: Int,
+        exercises: [WorkoutExerciseData],
+        gameManager: GameManager
+    ) {
+        let setData = exercises.enumerated().map { _, exercise in
+            (
+                exercise: exercise.name,
+                sets: max(exercise.sets ?? 0, 1),
+                reps: max(exercise.reps ?? 0, 1),
+                weight: exercise.weight ?? 0,
+                rpe: 7
+            )
+        }
+
+        let workout = createWorkout(title: name, sets: setData)
+        finishWorkout(workout, duration: duration, gameManager: gameManager)
+    }
+
     func finishWorkout(_ workout: Workout, duration: Int, gameManager: GameManager) {
         workout.duration = Int32(duration)
 
