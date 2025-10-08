@@ -46,6 +46,7 @@ struct YukaScannerView: View {
             .background(Color.screenBackground.ignoresSafeArea())
             .navigationTitle("Yuka")
             .toolbar {
+#if os(iOS)
                 ToolbarItem(placement: .topBarLeading) {
                     MenuButton(action: onMenuToggle)
                 }
@@ -58,6 +59,20 @@ struct YukaScannerView: View {
                     }
                     .disabled(nutritionManager.recentFoods.isEmpty)
                 }
+#else
+                ToolbarItem(placement: .automatic) {
+                    MenuButton(action: onMenuToggle)
+                }
+
+                ToolbarItem(placement: .automatic) {
+                    Button {
+                        showingHistory = true
+                    } label: {
+                        Label("History", systemImage: "clock.arrow.circlepath")
+                    }
+                    .disabled(nutritionManager.recentFoods.isEmpty)
+                }
+#endif
             }
             .sheet(isPresented: $showingHistory) {
                 NavigationStack {
@@ -189,14 +204,14 @@ struct YukaScannerView: View {
                     .foregroundStyle(.secondary)
 
                 TextField("Label", text: $label)
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
 
                 Picker("Meal", selection: $meal) {
                     ForEach(["Breakfast", "Lunch", "Dinner", "Snack"], id: \.self) { value in
                         Text(value).tag(value)
                     }
                 }
-                .pickerStyle(.segmented)
+                .pickerStyle(SegmentedPickerStyle())
             }
 
             Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 16) {
@@ -309,8 +324,10 @@ struct YukaScannerView: View {
                 .foregroundStyle(.secondary)
             HStack {
                 TextField("0", text: value)
+#if os(iOS)
                     .keyboardType(.numberPad)
-                    .textFieldStyle(.plain)
+#endif
+                    .textFieldStyle(PlainTextFieldStyle())
                 Text(suffix)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
